@@ -1,0 +1,9 @@
+{
+    "full_name": "Alon Gubkin",
+    "email": "alon@aporia.com",
+    "project_name": "My Model",
+    "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '-') }}",
+    "module_name": "{{ cookiecutter.project_name.lower().replace(' ', '_').replace('-', '_') }}",
+    "project_short_description": "My awesome model!",
+    "version": "0.1.0"
+}

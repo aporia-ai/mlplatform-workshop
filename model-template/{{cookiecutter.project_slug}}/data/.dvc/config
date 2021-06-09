@@ -1,0 +1,4 @@
+[core]
+    remote = s3
+['remote "s3"']
+    url = s3://dvc-bucket-511118e

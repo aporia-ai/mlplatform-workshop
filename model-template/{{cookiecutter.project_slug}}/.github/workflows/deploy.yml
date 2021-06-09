@@ -1,0 +1,23 @@
+name: Deploy
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Install dependencies
+        run: make install-deps
+
+      - name: Deploy
+        run: make deploy
+        env:
+          AWS_ACCESS_KEY_ID: {% raw %}${{ secrets.AWS_ACCESS_KEY_ID }}{% endraw %}
+          AWS_SECRET_ACCESS_KEY: {% raw %}${{ secrets.AWS_SECRET_ACCESS_KEY }}{% endraw %}
+          AWS_REGION: {% raw %}${{ secrets.AWS_REGION }}{% endraw %}
+          AWS_ECR_ACCOUNT_URL: {% raw %}${{ secrets.AWS_ECR_ACCOUNT_URL }}{% endraw %}
+          PULUMI_ACCESS_TOKEN: {% raw %}${{ secrets.PULUMI_ACCESS_TOKEN }}{% endraw %}

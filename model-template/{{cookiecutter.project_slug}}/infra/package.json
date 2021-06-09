@@ -1,0 +1,13 @@
+{
+    "name": "{{cookiecutter.project_slug}}-infra",
+    "devDependencies": {
+        "@types/node": "^10.0.0"
+    },
+    "dependencies": {
+        "@pulumi/aws": "^4.0.0",
+        "@pulumi/awsx": "^0.30.0",
+        "@pulumi/kubernetes": "^3.3.0",
+        "@pulumi/kubernetesx": "^0.1.6",
+        "@pulumi/pulumi": "^3.0.0"
+    }
+}
