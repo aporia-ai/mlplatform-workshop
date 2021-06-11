@@ -1,9 +1,9 @@
 # mlplatform-workshop
 
-This repo contains example code for a very basic ML platform:
+This repo contains example code for a (very basic) ML platform.
 
- * The model-template directory contains an example for a Cookiecutter-based template that data scientists can clone to start a new project.
- * The infra directory contains Pulumi code that spins up the shared infrastructure of the ML platform, such as Kubernetes, MLFlow, etc.
+ * The **model-template** directory contains an example for a Cookiecutter-based template that data scientists can clone to start a new project.
+ * The **infra** directory contains Pulumi code that spins up the shared infrastructure of the ML platform, such as Kubernetes, MLFlow, etc.
 
 <img src="docs/architecture.png">
 
