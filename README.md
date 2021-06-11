@@ -9,7 +9,7 @@ This repo contains example code for a (very basic) ML platform.
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/s8Jj9gzQ3xA/0.jpg)](https://www.youtube.com/watch?v=s8Jj9gzQ3xA)
 
-### Why?
+## Why?
 
 As data science teams become more mature with models reaching actual production, the need for a proper infrastructure becomes crucial. Leading companies in the field with massive engineering teams like Uber, Netflix and Airbnb had created multiple solutions for their infrastructure and named the combination of them as “ML Platform”.
 
@@ -32,7 +32,7 @@ We hope this repo can help you get started with building your own ML platform �
 When building your own ML platform, do not take these tools for granted! [Check out alternatives](https://mlops.toys) and find the best tools that solve each one of your problems.
 
 
-### What's missing from this?
+## What's missing from this?
 
 Well... a lot actually. Here's a partial list:
 
