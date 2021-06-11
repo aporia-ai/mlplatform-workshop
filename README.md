@@ -1,4 +1,4 @@
-# mlplatform-workshop
+# ML Platform Workshop
 
 This repo contains example code for a (very basic) ML platform.
 
