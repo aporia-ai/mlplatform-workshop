@@ -22,6 +22,20 @@ We hope this repo can help you get started with building your own ML platform ‚ù
 * [Pulumi](https://www.pulumi.com/) - Infrastructure as Code
 * [GitHub Actions](https://github.com/features/actions) - for CI/CD
 * [Traefik](https://traefik.io/) - API gateway
+* [Poetry](https://python-poetry.org/) - Python dependency management
 
 When building your own ML platform, do not take these tools for granted! [Check out alternatives](https://mlops.toys) and find the best tools that solve each one of your problems.
 
+
+### What's missing from this?
+
+Well... a lot actually. Here's a partial list:
+
+* HTTPS & Authentication
+* Environments (staging, production)
+* Common library for preprocessing, postprocessing, etc
+* Model input & validation
+* Training orchestration
+* and probably much more!
+
+We would love your help!
