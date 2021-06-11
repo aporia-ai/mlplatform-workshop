@@ -9,16 +9,15 @@ This repo contains example code for a (very basic) ML platform.
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/s8Jj9gzQ3xA/0.jpg)](https://www.youtube.com/watch?v=s8Jj9gzQ3xA)
 
-## Architecture 
-
-<img src="docs/architecture.png">
-
 ### Why?
 
 As data science teams become more mature with models reaching actual production, the need for a proper infrastructure becomes crucial. Leading companies in the field with massive engineering teams like Uber, Netflix and Airbnb had created multiple solutions for their infrastructure and named the combination of them as “ML Platform”.
 
 We hope this repo can help you get started with building your own ML platform ❤️
 
+## Architecture 
+
+<img src="docs/architecture.png">
 
 ### Based on the following projects:
 * [FastAPI](https://fastapi.tiangolo.com/) - for model serving
