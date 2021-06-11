@@ -5,6 +5,12 @@ This repo contains example code for a (very basic) ML platform.
  * The **model-template** directory contains an example for a Cookiecutter-based template that data scientists can clone to start a new project.
  * The **infra** directory contains Pulumi code that spins up the shared infrastructure of the ML platform, such as Kubernetes, MLFlow, etc.
 
+## The YouTube Video
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/s8Jj9gzQ3xA/0.jpg)](https://www.youtube.com/watch?v=s8Jj9gzQ3xA)
+
+## Architecture 
+
 <img src="docs/architecture.png">
 
 ### Why?
