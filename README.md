@@ -23,5 +23,5 @@ We hope this repo can help you get started with building your own ML platform ‚ù
 * [GitHub Actions](https://github.com/features/actions) - for CI/CD
 * [Traefik](https://traefik.io/) - API gateway
 
-When building your own ML platform, do not take these tools for granted! [Check out alternatives](mlops.toys) and find the best solutions for your problems.
+When building your own ML platform, do not take these tools for granted! [Check out alternatives](https://mlops.toys) and find the best tools that solve each one of your problems.
 
