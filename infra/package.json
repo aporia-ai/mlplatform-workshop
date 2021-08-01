@@ -1,14 +1,14 @@
 {
-    "name": "mlplatform-infra",
+    "name": "mlplatform-infra-azure",
     "devDependencies": {
-        "@types/node": "^14.14.41"
+        "@types/node": "^10.0.0"
     },
     "dependencies": {
-        "@pulumi/aws": "^4.0.0",
-        "@pulumi/awsx": "^0.30.0",
-        "@pulumi/eks": "^0.30.0",
-        "@pulumi/kubernetes": "^3.0.0",
+        "@pulumi/azure-native": "^1.0.0",
+        "@pulumi/azuread": "^4.3.0",
+        "@pulumi/kubernetes": "^3.5.2",
         "@pulumi/pulumi": "^3.0.0",
-        "@pulumi/random": "^4.0.0"
+        "@pulumi/random": "^4.2.0",
+        "@pulumi/tls": "^4.0.0"
     }
 }

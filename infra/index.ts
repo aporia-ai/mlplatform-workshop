@@ -1,62 +1,79 @@
-import * as aws from '@pulumi/aws';
-import * as eks from '@pulumi/eks';
-import * as k8s from '@pulumi/kubernetes';
-import * as random from '@pulumi/random';
-import S3ServiceAccount from './S3ServiceAccount';
-import TraefikRoute from './TraefikRoute';
-
-
-// Create a Kubernetes cluster.
-const cluster = new eks.Cluster('mlplatform-eks', {
-  createOidcProvider: true,
-});
+import * as pulumi from "@pulumi/pulumi";
+import * as k8s from "@pulumi/kubernetes";
+import * as random from "@pulumi/random";
+import * as cluster from "./cluster";
+import { resourceGroup } from "./resourcegroup";
+import * as dbforpostgresql from "@pulumi/azure-native/dbforpostgresql";
+import * as storage from "@pulumi/azure-native/storage";
 
 
 // Install Traefik
 const traefik = new k8s.helm.v3.Chart('traefik', {
-  chart: 'traefik',
-  fetchOpts: { repo: 'https://containous.github.io/traefik-helm-chart' },
-}, { provider: cluster.provider })
+    chart: 'traefik',
+    fetchOpts: { repo: 'https://containous.github.io/traefik-helm-chart' },
+}, { provider: cluster.k8sProvider })
 
+  
+// Create the MLFlow DB
+const mlflowDBPassword = new random.RandomPassword("mlflow-db-password", {
+    length: 20,
+    special: false,
+})
 
+const mlflowDBServer = new dbforpostgresql.Server("mlflow-db-server", {
+    location: "westus",
+    properties: {
+        administratorLogin: "cloudsa",
+        administratorLoginPassword: mlflowDBPassword.result,
+        createMode: "Default",
+        sslEnforcement: "Disabled",
+        storageProfile: {
+            backupRetentionDays: 7,
+            geoRedundantBackup: "Disabled",
+            storageMB: 128000,
+        },
+    },
+    resourceGroupName: resourceGroup.name,
+    serverName: "mlplatform-workshop-mlflow",
+    sku: {
+        capacity: 2,
+        family: "Gen5",
+        name: "B_Gen5_2",
+        tier: "Basic",
+    },
+    tags: {
+        ElasticServer: "1",
+    },
+});
 
-// Create PostgreSQL database for MLFlow - this will save model metadata
-const dbPassword = new random.RandomPassword('mlplatform-db-password', { length: 16, special: false });
-const db = new aws.rds.Instance('mlflow-db', {
-  allocatedStorage: 10,
-  engine: "postgres",
-  engineVersion: "11.10",
-  instanceClass: "db.t3.medium",
-  name: "mlflow",
-  password: dbPassword.result,
-  skipFinalSnapshot: true,
-  vpcSecurityGroupIds: [cluster.clusterSecurityGroup.id, cluster.nodeSecurityGroup.id],
-  username: "postgres",
+const mlflowDB = new dbforpostgresql.Database("mlflow-db", {
+    charset: "UTF8",
+    collation: "English_United States.1252",
+    databaseName: "mlflow",
+    resourceGroupName: resourceGroup.name,
+    serverName: mlflowDBServer.name,
 });
 
 
-// Create S3 bucket for MLFlow
-const mlflowBucket = new aws.s3.Bucket("mlflow-bucket", {
-  acl: "public-read-write",
+// Create storage for MLFlow artifacts
+const storageAccount = new storage.StorageAccount("sa", {
+    resourceGroupName: resourceGroup.name,
+    sku: {
+        name: storage.SkuName.Standard_LRS,
+    },
+    kind: storage.Kind.StorageV2,
 });
 
-
-// Create S3 bucket for DVC
-const dvcBucket = new aws.s3.Bucket("dvc-bucket", {
-  acl: "public-read-write",
-});
+const artifactStorage = new storage.BlobContainer("artifact-storage", {
+    accountName: storageAccount.name,
+    resourceGroupName: resourceGroup.name,
+})
 
 
 // Install MLFlow
 const mlflowNamespace = new k8s.core.v1.Namespace('mlflow-namespace', {
   metadata: { name: 'mlflow' },
-}, { provider: cluster.provider });
-
-const mlflowServiceAccount = new S3ServiceAccount('mlflow-service-account', {
-  namespace: mlflowNamespace.metadata.name,
-  oidcProvider: cluster.core.oidcProvider!,
-  readOnly: false,
-}, { provider: cluster.provider });
+}, { provider: cluster.k8sProvider });
 
 const mlflow = new k8s.helm.v3.Chart("mlflow", {
   chart: "mlflow",
@@ -64,50 +81,31 @@ const mlflow = new k8s.helm.v3.Chart("mlflow", {
   values: {
     "backendStore": {
       "postgres": {
-        "username": db.username,
-        "password": db.password,
-        "host": db.address,
-        "port": db.port,
+        "username": mlflowDBServer.name.apply(serverName => `cloudsa@${serverName}`),
+        "password": mlflowDBPassword.result,
+        "host": mlflowDBServer.fullyQualifiedDomainName,
+        "port": 5432,
         "database": "mlflow"
       }
     },
-    "defaultArtifactRoot": mlflowBucket.bucket.apply((bucketName: string) => `s3://${bucketName}`),
-    "serviceAccount": {
-      "create": false,
-      "name": mlflowServiceAccount.name,
-    }
+    "defaultArtifactRoot": pulumi.all([storageAccount.name, artifactStorage.name])
+      .apply(([storageAccountName, artifactStorageName]) => `wasbs://${artifactStorageName}@${storageAccountName}.blob.core.windows.net/`),
+    // "serviceAccount": {
+    //   "create": false,
+    //   "name": mlflowServiceAccount.name,
+    // }
   },
   fetchOpts: { repo: "https://larribas.me/helm-charts" },
-}, { provider: cluster.provider });
+}, { provider: cluster.k8sProvider });
 
 
-// Expose MLFlow in Traefik as /mlflow 
-new TraefikRoute('mlflow', {
-  prefix: '/mlflow',
-  service: mlflow.getResource('v1/Service', 'mlflow', 'mlflow'),
-  namespace: mlflowNamespace.metadata.name,
-}, { provider: cluster.provider, dependsOn: [mlflow] });
+// Export the primary key of the Storage Account
+// const storageAccountKeys = pulumi.all([resourceGroup.name, storageAccount.name]).apply(([resourceGroupName, accountName]) =>
+//     storage.listStorageAccountKeys({ resourceGroupName, accountName }));
+// export const primaryStorageKey = storageAccountKeys.keys[0].value;
 
 
-// Service account for models with read only access to models
-const modelsServiceAccount = new S3ServiceAccount('models-service-account', {
-  namespace: 'default',
-  oidcProvider: cluster.core.oidcProvider!,
-  readOnly: true,
-}, { provider: cluster.provider });
 
+export let clusterName = cluster.k8sCluster.name;
 
-// Set ml.mycompany.com DNS record in Route53
-new aws.route53.Record("record", {
-  zoneId: "<ZONE ID>",
-  name: "ml.mycompany.com",
-  type: "CNAME",
-  ttl: 300,
-  records: [traefik.getResource('v1/Service', 'traefik').status.loadBalancer.ingress[0].hostname],
-});
-
-
-export const kubeconfig = cluster.kubeconfig;
-export const mlflowTrackingURI = `http://ml.mycompany.com/mlflow`;
-export const dvcBucketURI = dvcBucket.bucket.apply((bucketName: string) => `s3://${bucketName}`);
-export const modelsServiceAccountName = modelsServiceAccount.name;
+export let kubeconfig = cluster.kubeconfig;
