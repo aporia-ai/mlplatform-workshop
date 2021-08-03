@@ -142,7 +142,7 @@ const flyteBucket = new aws.s3.Bucket("flyte-bucket", {
   acl: "public-read-write",
 });
 
-
+// TODO: Value should *really* be seperated to a different file :)
 const flyte = new k8s.helm.v3.Chart("flyte", {
   chart: "flyte",
   namespace: flyteNamespace.metadata.name,
