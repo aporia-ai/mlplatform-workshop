@@ -11,6 +11,7 @@ export interface S3ServiceAccountArgs {
 export default class S3ServiceAccount extends pulumi.ComponentResource {
   public /*out*/ readonly name: pulumi.Output<string>;
   public /*out*/ readonly serviceAccount: pulumi.Output<k8s.core.v1.ServiceAccount>;
+  public /*out*/ readonly role: pulumi.Output<aws.iam.Role>;
 
   constructor(name: string, args: S3ServiceAccountArgs, opts?: pulumi.ResourceOptions) {
     super("pkg:index:S3ServiceAccount", name, {}, opts);
@@ -60,10 +61,12 @@ export default class S3ServiceAccount extends pulumi.ComponentResource {
     }, { provider: opts?.provider }));
 
     this.name = pulumi.output(this.serviceAccount.metadata.name);
+    this.role = pulumi.output(serviceAccountRole);
 
     super.registerOutputs({
       name: this.serviceAccount.metadata.name,
       serviceAccount: this.serviceAccount,
+      role: serviceAccountRole,
     });
   }
 }
