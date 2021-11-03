@@ -5,6 +5,8 @@ This repo contains example code for a (very basic) ML platform.
  * The **model-template** directory contains an example for a Cookiecutter-based template that data scientists can clone to start a new project.
  * The **infra** directory contains Pulumi code that spins up the shared infrastructure of the ML platform, such as Kubernetes, MLFlow, etc.
 
+<p align="center">Made with :heart: by <a href="https://www.aporia.com?utm_source=github&utm_medium=github&utm_campaign=mlplatform_workshop" target="_blank">Aporia</a></p>
+
 ## The YouTube Video
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/s8Jj9gzQ3xA/0.jpg)](https://www.youtube.com/watch?v=s8Jj9gzQ3xA)
